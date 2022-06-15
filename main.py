@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from tkinter import *
 
 
 def stop_game(board):
@@ -22,11 +23,14 @@ class Board:
         else:
             if self.current_player == 1:
                 self.current_board[x][y] = 1
+                btn_list[x][y].configure(text="x")
                 self.current_player = 2
             else:
                 self.current_board[x][y] = 5
+                btn_list[x][y].configure(text="o")
                 self.current_player = 1
 
+            label_info.configure(text=f"player: {b.curr_player()}")
             win = self.check_victory(x, y)
             if not win:
                 if 0 not in self.current_board:
@@ -36,8 +40,11 @@ class Board:
             else:
                 if self.current_player == 1:
                     print("player o has won")
+                    label_info.configure(text="Player o has won!!")
                 else:
                     print("player x has won")
+                    label_info.configure(text="Player x has won!!")
+
                 stop_game(self.current_board)
 
     def check_victory(self, x, y):
@@ -66,22 +73,22 @@ class Board:
 
     def ai_move(self):
 
-        if self.check_win(): #done
+        if self.check_win():
             return
-        if self.check_block(): #done tutaj sie cos jebie
+        if self.check_block():
             return
-        if self.check_fork(): #done
+        if self.check_fork():
             return
-        if self.check_player_fork(): #done
-            return 
-        if self.check_center(): #done
-            return 
-        if self.opposite_corner(): #done
+        if self.check_player_fork():
             return
-        if self.empty_corner(): #done
-            return 
-        if self.empty_side(): #done
-            return 
+        if self.check_center():
+            return
+        if self.opposite_corner():
+            return
+        if self.empty_corner():
+            return
+        if self.empty_side():
+            return
 
         return
 
@@ -175,7 +182,7 @@ class Board:
             for j in range(3):
                 if self.current_board[i][j] == 0:
 
-                    self.current_board[i][j] = 5    #robie ruch
+                    self.current_board[i][j] = 5  # robie ruch
 
                     # sprawdzam czy po ruchu mam wiecej niz 1 opcje na wygreanie
                     wins = self.check_win_without_move()
@@ -199,7 +206,7 @@ class Board:
 
                     self.current_board[i][j] = 1  # robie ruch
 
-                    # sprawdzam czy po ruchu mam wiecej niz 1 opcje na wygreanie
+                    # sprawdzam czy po ruchu mam wiecej niz 1 opcje na wygranie
                     wins = self.check_win_without_move()
 
                     if wins >= 2:
@@ -272,14 +279,55 @@ class Board:
             return True
 
 
+def on_click(ind, board):
+    # if player_starts:
+    board.move(ind[0], ind[1])
+    board.ai_move()
+    # else:
+    #     board.ai_move()
+    #     board.move(ind[0], ind[1])
+
+
+
+def init_board():
+    b.current_board = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    # player_starts = random.choice([True, False])
+
+    # print(player_starts)
+    btn_list.clear()
+    for x in range(3):
+        tmp_list = []
+        for y in range(3):
+            btn = Button(frame, command=lambda ind=(x, y): on_click(ind, b), text="", font=("Arial", 20))
+            btn.grid(column=x, row=y, sticky="nesw")
+            tmp_list.append(btn)
+        btn_list.append(tmp_list)
+
+    frame.columnconfigure(tuple(range(3)), weight=1)
+    frame.rowconfigure(tuple(range(3)), weight=1)
+
+
 if __name__ == '__main__':
     b = Board()
-    counter = 0
+    # player_starts = random.choice([True, False])
 
-    while counter != 9:
-        b.print_board()
-        player_move = list(map(int, input().split()))
-        b.move(int(player_move[0]), int(player_move[1]))
-        b.print_board()
-        b.ai_move()
-        counter = counter + 1
+    root = Tk()
+    frame = Frame(root)
+    root.rowconfigure(0, weight=1)
+    root.columnconfigure(0, weight=1)
+
+    root.geometry("600x600")
+    frame.grid(row=0, column=0, sticky="news")
+    grid = Frame(frame)
+
+    btn_list = []
+
+    init_board()
+
+    btn = Button(frame, command=init_board, text="new game", font=("Arial", 30), bg="#FBC944")
+    btn.grid(column=0, row=4, columnspan=3, sticky="nesw", pady=5, padx=5)
+
+    label_info = Label(frame, text=f"player: {b.curr_player()}", font=("Arial", 30), bg="#FBC944")
+    label_info.grid(column=0, row=3, columnspan=3, sticky="nesw", pady=5, padx=5)
+
+    root.mainloop()
