@@ -1,12 +1,13 @@
-from tkinter import *
 import random
 import numpy as np
+
 
 def stop_game(board):
     for i in range(3):
         for j in range(3):
             if board[i][j] == 0:
                 board[i][j] = 3
+
 
 class Board:
     def __init__(self):
@@ -67,6 +68,8 @@ class Board:
 
         if self.check_win():
             return
+        if self.check_block():
+            return
 
         return
 
@@ -80,12 +83,54 @@ class Board:
             if sum(self.current_board[:, i]) == 10:
                 ai_ind = [list(self.current_board[i]).index(0), i]
 
+        if (self.current_board[0][0] + self.current_board[1][1]) == 10 and self.current_board[2][2] == 0:
+            ai_ind = [2, 2]
+        if (self.current_board[0][0] + self.current_board[2][2]) == 10 and self.current_board[1][1] == 0:
+            ai_ind = [1, 1]
+        if (self.current_board[1][1] + self.current_board[2][2]) == 10 and self.current_board[0][0] == 0:
+            ai_ind = [0, 0]
+        if (self.current_board[2][0] + self.current_board[1][1]) == 10 and self.current_board[0][2] == 0:
+            ai_ind = [0, 2]
+        if (self.current_board[2][0] + self.current_board[0][2]) == 10 and self.current_board[1][1] == 0:
+            ai_ind = [1, 1]
+        if (self.current_board[1][1] + self.current_board[0][2]) == 10 and self.current_board[2][0] == 0:
+            ai_ind = [2, 0]
+
         if len(ai_ind) == 0:
             return False
         else:
             self.move(ai_ind[0], ai_ind[1])
             return True
 
+    def check_block(self):
+        # check if player can win in next move
+        ai_ind = []
+        for i in range(3):
+            if sum(self.current_board[i]) == 2:
+                ai_ind = [i, list(self.current_board[i]).index(0)]
+
+        for i in range(3):
+            if sum(self.current_board[:, i]) == 2:
+                ai_ind = [list(self.current_board[i]).index(0), i]
+
+        if (self.current_board[0][0] + self.current_board[1][1]) == 2 and self.current_board[2][2] == 0:
+            ai_ind = [2, 2]
+        if (self.current_board[0][0] + self.current_board[2][2]) == 2 and self.current_board[1][1] == 0:
+            ai_ind = [1, 1]
+        if (self.current_board[1][1] + self.current_board[2][2]) == 2 and self.current_board[0][0] == 0:
+            ai_ind = [0, 0]
+        if (self.current_board[2][0] + self.current_board[1][1]) == 2 and self.current_board[0][2] == 0:
+            ai_ind = [0, 2]
+        if (self.current_board[2][0] + self.current_board[0][2]) == 2 and self.current_board[1][1] == 0:
+            ai_ind = [1, 1]
+        if (self.current_board[1][1] + self.current_board[0][2]) == 2 and self.current_board[2][0] == 0:
+            ai_ind = [2, 0]
+
+        if len(ai_ind) == 0:
+            return False
+        else:
+            self.move(ai_ind[0], ai_ind[1])
+            return True
 
 
 if __name__ == '__main__':
@@ -99,4 +144,3 @@ if __name__ == '__main__':
         player_move = input()
         b.move(int(player_move[0]), int(player_move[2]))
         b.ai_move()
-
